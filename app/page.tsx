@@ -291,11 +291,12 @@ export default function LandingPage() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    setSubmitted(true);
+    window.location.href = "/sign-up";
   }
 
   return (
     <div style={{ background: C.bg, color: C.text, fontFamily: "'DM Sans', system-ui, sans-serif", overflowX: "hidden" }}>
+      <AuthRedirect />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -412,7 +413,7 @@ export default function LandingPage() {
                 <span style={{ fontSize: 18 }}>→</span>
               </button>
             </SignUpButton>
-            <button className="btn-ghost" style={{ fontSize: 14, padding: "14px 24px", borderRadius: 9 }} onClick={() => document.getElementById("demo-capture")?.scrollIntoView({ behavior: "smooth" })}>
+            <button className="btn-ghost" style={{ fontSize: 14, padding: "14px 24px", borderRadius: 9 }} onClick={() => window.location.href = "/dashboard"}>
               View Live Demo
             </button>
           </div>
@@ -661,7 +662,7 @@ export default function LandingPage() {
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "28px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, color: C.textMuted, flexWrap: "wrap", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <div style={{ width: 18, height: 18, background: "linear-gradient(135deg, #06b6d4, #10b981)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9 }}>⚡</div>
-          Ventus © 2024
+          Ventus © 2026
         </div>
         <div style={{ fontFamily: "monospace" }}>Built for the field. Powered by Ventus.</div>
       </footer>
