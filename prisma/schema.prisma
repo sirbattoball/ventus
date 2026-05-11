@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id          String       @id @default(cuid())
+  name        String
+  clerkOrgId  String?      @unique
+  plan        Plan         @default(STARTER)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  technicians Technician[]
+  jobs        Job[]
+  schedules   Schedule[]
+  users       User[]
+  leads       Lead[]
+}
+
+model User {
+  id         String   @id @default(cuid())
+  clerkId    String   @unique
+  email      String   @unique
+  name       String?
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  role       Role     @default(ADMIN)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Technician {
+  id           String          @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  lat          Float
+  lng          Float
+  available    Boolean         @default(true)
+  startTime    String          @default("08:00")
+  endTime      String          @default("17:00")
+  businessId   String
+  business     Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assignments  Assignment[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model Job {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  customerName String
+  address      String?
+  lat          Float
+  lng          Float
+  value        Float
+  durationMins Int
+  priority     Priority     @default(MEDIUM)
+  status       JobStatus    @default(PENDING)
+  scheduledFor DateTime?
+  businessId   String
+  business     Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assignment   Assignment?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Schedule {
+  id           String       @id @default(cuid())
+  date         DateTime
+  businessId   String
+  business     Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assignments  Assignment[]
+  baselineRevenue    Float?
+  optimizedRevenue   Float?
+  efficiencyGain     Float?
+  missedRevenue      Float?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Assignment {
+  id           String     @id @default(cuid())
+  scheduleId   String
+  schedule     Schedule   @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  technicianId String
+  technician   Technician @relation(fields: [technicianId], references: [id])
+  jobId        String     @unique
+  job          Job        @relation(fields: [jobId], references: [id])
+  sequence     Int
+  travelMins   Int        @default(0)
+  startTime    String?
+  endTime      String?
+  isOptimized  Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+}
+
+enum Plan {
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  VIEWER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum JobStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETE
+  CANCELLED
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  businessId      String
+  business        Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  businessName    String
+  phone           String?
+  website         String?
+  address         String?
+  city            String
+  state           String     @default("US")
+  rating          Float?
+  reviewCount     Int        @default(0)
+  estimatedTechs  Int        @default(0)
+  leadScore       Float      @default(0)
+  outreachAngle   String?
+  placeId         String?    @unique
+  status          LeadStatus @default(NEW)
+  outreachMessage String?
+  notes           String?
+  contactedAt     DateTime?
+  repliedAt       DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([leadScore])
+  @@index([businessId])
+  @@index([status])
+  @@index([city])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  REPLIED
+  DEMO_BOOKED
+  CONVERTED
+  DEAD
+}
